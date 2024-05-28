@@ -38,7 +38,7 @@ class DataTransformer:
             categorical_pipeline = Pipeline(
                 steps=[
                     ("imputer",SimpleImputer(strategy="most_frequent")),
-                    ("encoder",OneHotEncoder()),
+                    ("one_hot_encoder",OneHotEncoder()),
                     ("scaler",StandardScaler(with_mean=False))
                 ]
             )
@@ -50,9 +50,9 @@ class DataTransformer:
             logging.info("Categorical Transformation completed")
             
             data_transform = ColumnTransformer(
-                [
-                    ("numeric_pipeline", numerical_pipeline, numerical_features),
-                    ("cat_pipeline", categorical_pipeline, categorical_features)
+                transformers=[
+                    ("numeric_pipelines", numerical_pipeline, numerical_features),
+                    ("cat_pipelines", categorical_pipeline, categorical_features)
                 ]
             )
             
@@ -82,8 +82,10 @@ class DataTransformer:
             input_feature_train_arr = transformation_obj.fit_transform(input_feature_train_df)
             input_feature_test_arr = transformation_obj.transform(input_feature_test_df)
             
-            train_arr = np.c_[input_feature_train_arr, np.array(input_feature_train_df)]
-            test_arr = np.c_[input_feature_test_arr, np.array(input_feature_test_df)]
+            # logging.info(f"input_feature_test_arr: {input_feature_test_arr}")
+            train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]
+            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
+            # logging.info(f"input_feature_test_arr: {input_feature_test_arr}")
             
             logging.info("Saving the transformed object")
             
@@ -99,3 +101,4 @@ class DataTransformer:
             )
         except Exception as e:
             raise CustomException(e,sys)
+
